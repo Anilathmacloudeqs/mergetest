@@ -47,9 +47,9 @@ jobs:
 
       - name: Merging repo
         run: |
-          pwsh -File ./.github/workflows/mergerepo.ps1 -SourceTag ${{ inputs.Tag }} ${{ vars.TargetBranch_PROD}} ${{ vars.SVC_REPOS_EMAIL}} ${{ vars.SVC_REPOS_USERNAME}}
+          pwsh -File ./.github/workflows/mergerepo.ps1 -SourceTag ${{ inputs.Tag }} -TargetBranch 'prod' -svc_repos_email ${{ secrets.SVC_REPOS_EMAIL }} -svc_repos_username ${{ secrets.SVC_REPOS_USERNAME }}
         shell: pwsh
-     
+    
       - name: printING commit id  
         run: echo "COMMIT ID IS ${{ env.COMMIT_ID }}"
 
