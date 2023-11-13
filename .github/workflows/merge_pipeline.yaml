@@ -10,15 +10,6 @@ on:
         
 env:
   COMMIT_ID: ${{ github.sha }}
-  #COMMIT_ID: '1'
-  #SVC_MATILLION_USERNAME: ${{secrets.SVC_MATILLION_PASSWORD}}
-  #svc_matillion_password: 'test1234'
-  #Matillion_Project: 'CLOUDX_DEMO'
-  #Matillion_Group: 'TEST'
-  #Matillion_Version: 'v1.1'
-  #Matillion_Instance: '192.168.1.1'
-  #svc_repos_email: 'test@gmail.com'
-  #svc_repos_password: 'test1234'
   
   
 jobs:
@@ -31,7 +22,6 @@ jobs:
       - name: GetCommitId
         run: |
           pwsh -File ./.github/workflows/getcommitid.ps1 -SourceTag ${{ inputs.Tag }}
-        #echo "COMMIT_ID=$commitid" >> $GITHUB_ENV
         shell: pwsh
      
       - name: print commit id
@@ -48,24 +38,10 @@ jobs:
       - name: Run Python script
         run: python ./.github/workflows/matillion_api_call.py ${{ vars.SVC_MATILLION_USERNAME }}  ${{ secrets.SVC_MATILLION_PASSWORD }} ${{ vars.MATILLION_PROJECT }} ${{ vars.MATILLION_GROUP }} ${{ vars.MATILLION_VERSION }} ${{ vars.MATILLION_INSTANCE }} ${{ vars.SVC_REPOS_EMAIL}} ${{secrets.SVC_REPOS_PASSWORD}} ${{ env.COMMIT_ID }}
 
-  #approval:
-   # runs-on: ubuntu-latest
-   # needs: release
-   # steps:
-      #- name: Send Approval Request
-       # uses: actions/github-script@v3
-       # with:
-        #  github-token: ${{ secrets.GITHUB_TOKEN }}
-        #  script: |
-        #    const adminEmail = 'bikramjots@cloudeqs.com';
-        #    console.log(`Approval request sent to ${adminEmail}`);
-        #    core.setOutput('approval', 'pending')
 
   prod:
     runs-on: ubuntu-latest
     needs: release
-    #needs: [release, approval]
-    #if: ${{ needs.approval.outputs.approval == 'approved' }}
     steps:
       - uses: actions/checkout@v3
 
