@@ -36,8 +36,7 @@ jobs:
         run: pip install -r requirements.txt
         
       - name: Run Python script
-        run: python ./.github/workflows/matillion_api_call.py ${{ vars.SVC_MATILLION_USERNAME }}  ${{ secrets.SVC_MATILLION_PASSWORD }} ${{ vars.MATILLION_PROJECT }} ${{ vars.MATILLION_GROUP }} ${{ vars.MATILLION_VERSION }} ${{ vars.MATILLION_INSTANCE }} ${{ vars.SVC_REPOS_EMAIL}} ${{secrets.SVC_REPOS_PASSWORD}} ${{ env.COMMIT_ID }}
-
+        run: python ./.github/workflows/matillion_api_call.py 
 
   prod:
     runs-on: ubuntu-latest
@@ -62,5 +61,4 @@ jobs:
         run: pip install -r requirements.txt
         
       - name: Run Python script
-        run: python ./.github/workflows/matillion_api_call.py ${{ vars.SVC_MATILLION_USERNAME_PROD }}  ${{ secrets.SVC_MATILLION_PASSWORD_PROD }} ${{ vars.MATILLION_PROJECT_PROD }} ${{ vars.MATILLION_GROUP_PROD }} ${{ vars.MATILLION_VERSION_PROD }} ${{ vars.MATILLION_INSTANCE_PROD }} ${{ vars.SVC_REPOS_EMAIL}} ${{secrets.SVC_REPOS_PASSWORD_PROD}} ${{ env.COMMIT_ID }}
-  
+        run: python ./.github/workflows/matillion_api_call.py
