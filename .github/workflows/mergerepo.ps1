@@ -1,7 +1,7 @@
 param (
     [Parameter(Mandatory = $true)]
     [String]
-    $TargetBranch,
+    $TargetBranch = "prod",
 
     [Parameter(Mandatory = $true)]
     [string]
@@ -18,8 +18,8 @@ param (
 
 )
 
-git config --global user.name 'Paramjit' 
-git config --global user.email 'params@cloudeqs.com'
+git config --global user.name 'Anilathmacloudeqs' 
+git config --global user.email 'anilathma@cloudeqs.com'
 git config pull.rebase false 
 git config --list
 git branch
