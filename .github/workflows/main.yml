@@ -1,0 +1,64 @@
+name: Merge Workflows
+
+on:
+  workflow_dispatch:
+    inputs:
+      Tag:
+        description: The git tag name to pass to the Python and PowerShell scripts.
+        required: true
+        type: string
+        
+env:
+  COMMIT_ID: ${{ github.sha }}
+  
+  
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: GetCommitId
+        run: |
+          pwsh -File ./.github/workflows/getcommitid.ps1 -SourceTag ${{ inputs.Tag }}
+        shell: pwsh
+     
+      - name: print commit id
+        run: echo "COMMIT ID IS ${{ env.COMMIT_ID }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        
+      - name: Run Python script
+        run: python ./.github/workflows/matillion_api_call.py 
+
+  prod:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Merging repo
+        run: |
+          pwsh -File ./.github/workflows/mergerepo.ps1 -SourceTag ${{ inputs.Tag }} -TargetBranch 'prod' -svc_repos_email ${{ secrets.SVC_REPOS_EMAIL }} -svc_repos_username ${{ secrets.SVC_REPOS_USERNAME }}
+        shell: pwsh
+    
+      - name: printING commit id  
+        run: echo "COMMIT ID IS ${{ env.COMMIT_ID }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        
+      - name: Run Python script
+        run: python ./.github/workflows/matillion_api_call.py
