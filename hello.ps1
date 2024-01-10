@@ -4,14 +4,13 @@
 $repository = $env:GITHUB_REPOSITORY
 $mainBranch = "main"
 $releaseBranch = "release"
-$patToken = $env:PAT_TOKEN
 
 # Set up Git configuration
 git config --global user.email "anilathma@cloudeqs.com"
 git config --global user.name "Anilathmacloudeqs"
 
-# Clone the repository
-git clone "https://github.com/$repository.git" repo
+# Clone the repository with the GitHub token
+git clone "https://github.com/$($env:GITHUB_ACTOR):$($env:GITHUB_TOKEN)@github.com/$repository.git" repo
 cd repo
 
 # Switch to the main branch
