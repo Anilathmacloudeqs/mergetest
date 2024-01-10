@@ -10,9 +10,10 @@ $commitMessage = "Commit message"
 $sourceApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$sourceBranch"
 $destinationApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$destinationBranch"
 
-$accessToken = $env:PAT_TOKEN  
+# Use the secret PAT_TOKEN
+$accessToken = $env:PAT_TOKEN
 if (-not $accessToken) {
-    Write-Error "Error: GitHub GITHUB_TOKEN not found in environment variables."
+    Write-Error "Error: GitHub PAT_TOKEN not found in environment variables."
     return
 }
 
