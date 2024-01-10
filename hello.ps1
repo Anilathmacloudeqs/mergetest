@@ -1,7 +1,7 @@
 Write-Host "Starting"
 
 $username = "Anilathmacloudeqs"
-$repository = "demotest"
+$repository = "mergetest"
 $sourceBranch = "main"
 $destinationBranch = "release"
 $filePath = "hello.ps1"
