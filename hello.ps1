@@ -1,50 +1,25 @@
-Write-Host "Starting"
-
-$username = "Anilathmacloudeqs"
+# Set GitHub repository details
+$githubUsername = "Anilathmacloudeqs"
 $repository = "mergetest"
-$sourceBranch = "main"
-$destinationBranch = "release"
-$filePath = "hello.ps1"
-$commitMessage = "Commit message"
+$patToken = $env:{{secrets.PAT_TOKEN}}  # Retrieve the access token from the repository secrets
 
-$sourceApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$sourceBranch"
-$destinationApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$destinationBranch"
+# Create the GitHub repository URL
+$repoUrl = "https://github.com/$githubUsername/$repository"
 
-# Use the secret PAT_TOKEN
-$accessToken = $env:PAT_TOKEN
-if (-not $accessToken) {
-    Write-Error "Error: GitHub PAT_TOKEN not found in environment variables."
-    return
-}
+# Create the API URL to list files in the repository
+$apiUrl = "$repoUrl/contents"
 
+# Make a request to GitHub API to get the list of files
 $headers = @{
-    Authorization = "token $accessToken"
+    Authorization = "Bearer $patToken"
+    Accept = "application/vnd.github.v3+json"
 }
 
-$sourceFileResponse = Invoke-RestMethod -Uri $sourceApiUrl -Headers $headers -Method Get
-Write-Host "Source API URL: $sourceApiUrl"
+$response = Invoke-RestMethod -Uri $apiUrl -Headers $headers -Method Get
 
-if ($sourceFileResponse.StatusCode -eq 200) {
-    $sourceFileContent = $sourceFileResponse | ConvertFrom-Json
-    $sourceCommitSha = $sourceFileContent.sha
-
-    $decodedContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($sourceFileContent.content))
-
-    $payload = @{
-        message = $commitMessage
-        content = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($decodedContent))
-        branch = $destinationBranch
-        sha = $sourceCommitSha
-    } | ConvertTo-Json
-
-    $response = Invoke-RestMethod -Uri $destinationApiUrl -Headers $headers -Method Put -Body $payload -ContentType "application/json"
-
-    if ($response.StatusCode -eq 201 -or $response.StatusCode -eq 200) {
-        Write-Host "File '$filePath' successfully pushed to the '$destinationBranch' branch."
-    } else {
-        Write-Error "Error: Unable to push file. Status code: $($response.StatusCode)"
-        Write-Error $response | ConvertTo-Json
+# Print the names of all files in the repository
+foreach ($file in $response) {
+    if ($file.type -eq "file") {
+        Write-Output $file.name
     }
-} else {
-    Write-Error "Error: Unable to fetch source file. Status code: $($sourceFileResponse.StatusCode)"
 }
