@@ -10,7 +10,7 @@ $commitMessage = "Commit message"
 $sourceApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$sourceBranch"
 $destinationApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$destinationBranch"
 
-$accessToken = $env:GITHUB_TOKEN  # GitHub Actions automatically sets the GITHUB_TOKEN secret
+$accessToken = $env:PAT_TOKEN  
 if (-not $accessToken) {
     Write-Error "Error: GitHub GITHUB_TOKEN not found in environment variables."
     return
