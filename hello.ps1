@@ -4,19 +4,22 @@
 $repository = $env:GITHUB_REPOSITORY
 $mainBranch = "main"
 $releaseBranch = "release"
+$patToken = $env:PAT_TOKEN
 
 # Set up Git configuration
 git config --global user.email "anilathma@cloudeqs.com"
 git config --global user.name "Anilathmacloudeqs"
 
-# Download only the latest version of hello.py from the main branch
-Invoke-RestMethod -Uri "https://raw.githubusercontent.com/$repository/$mainBranch/hello.py" -OutFile "hello.py"
+# Fetch the latest changes without cloning the whole repository
+git init
+git remote add origin "https://github.com/$repository.git"
+git fetch origin $mainBranch --depth 1
 
 # Switch to the release branch
 git checkout -b $releaseBranch
 
-# Overwrite hello.py in the release branch
-Copy-Item -Path "hello.py" -Destination "hello.py" -Force
+# Overwrite hello.py from the main branch
+git checkout origin/$mainBranch -- hello.py
 
 # Commit and push changes to the release branch
 git add .
