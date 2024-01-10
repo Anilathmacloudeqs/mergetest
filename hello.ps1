@@ -1,7 +1,7 @@
 # Set GitHub repository details
 $githubUsername = "Anilathmacloudeqs"
 $repository = "mergetest"
-$patToken = $env:{{secrets.PAT_TOKEN}}  # Retrieve the access token from the repository secrets
+$patToken = $env:INPUT_PAT_TOKEN  # Retrieve the access token from the repository secrets
 
 # Create the GitHub repository URL
 $repoUrl = "https://github.com/$githubUsername/$repository"
