@@ -1,27 +1,49 @@
-# hello.ps1
+Write-Host "Starting"
 
-# Define variables
-$repository = $env:GITHUB_REPOSITORY
-$mainBranch = "main"
-$releaseBranch = "release"
-$patToken = $env:PAT_TOKEN
+$username = "Anilathmacloudeqs"
+$repository = "demotest"
+$sourceBranch = "main"
+$destinationBranch = "release"
+$filePath = "hello.ps1"
+$commitMessage = "Commit message"
 
-# Set up Git configuration
-git config --global user.email "anilathma@cloudeqs.com"
-git config --global user.name "Anilathmacloudeqs"
+$sourceApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$sourceBranch"
+$destinationApiUrl = "https://api.github.com/repos/$username/$repository/contents/$filePath?ref=$destinationBranch"
 
-# Fetch the latest changes without cloning the whole repository
-git init
-git remote add origin "https://github.com/$repository.git"
-git fetch origin $mainBranch --depth 1
+$accessToken = $env:PAT_TOKEN
+if (-not $accessToken) {
+    Write-Error "Error: GitHub PAT_TOKEN not found in environment variables."
+    return
+}
 
-# Switch to the release branch
-git checkout -b $releaseBranch
+$headers = @{
+    Authorization = "token $accessToken"
+}
 
-# Overwrite hello.py from the main branch
-git checkout origin/$mainBranch -- hello.py
+$sourceFileResponse = Invoke-RestMethod -Uri $sourceApiUrl -Headers $headers -Method Get
+Write-Host "Source API URL: $sourceApiUrl"
 
-# Commit and push changes to the release branch
-git add .
-git commit -m "Update hello.py in $releaseBranch"
-git push --set-upstream origin $releaseBranch
+if ($sourceFileResponse.StatusCode -eq 200) {
+    $sourceFileContent = $sourceFileResponse | ConvertFrom-Json
+    $sourceCommitSha = $sourceFileContent.sha
+
+    $decodedContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($sourceFileContent.content))
+
+    $payload = @{
+        message = $commitMessage
+        content = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($decodedContent))
+        branch = $destinationBranch
+        sha = $sourceCommitSha
+    } | ConvertTo-Json
+
+    $response = Invoke-RestMethod -Uri $destinationApiUrl -Headers $headers -Method Put -Body $payload -ContentType "application/json"
+
+    if ($response.StatusCode -eq 201 -or $response.StatusCode -eq 200) {
+        Write-Host "File '$filePath' successfully pushed to the '$destinationBranch' branch."
+    } else {
+        Write-Error "Error: Unable to push file. Status code: $($response.StatusCode)"
+        Write-Error $response | ConvertTo-Json
+    }
+} else {
+    Write-Error "Error: Unable to fetch source file. Status code: $($sourceFileResponse.StatusCode)"
+}
