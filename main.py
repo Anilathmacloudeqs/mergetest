@@ -16,7 +16,7 @@ def push_file_to_branch(username, repository, source_branch, destination_branch,
     destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
 
     # Replace 'your_github_token' with your actual GitHub token
-    github_token = "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"
+    github_token = "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"
     headers = {'Authorization': f'token {github_token}'}
 
     source_file_response = requests.get(source_api_url, headers=headers)
