@@ -1,3 +1,4 @@
+print("started")
 import sys
 import requests
 import json
