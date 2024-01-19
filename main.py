@@ -3,6 +3,7 @@ import sys
 import requests
 import json
 import base64
+print("importes")
 
 github_token = sys.argv[1]
 
