@@ -15,13 +15,9 @@ def push_file_to_branch(username, repository, source_branch, destination_branch,
     source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
     destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
 
-    access_token = os.environ.get('PAT_TOKEN') 
-    print("token set")
-    if not access_token:
-        print("Error: GitHub PAT_TOKEN not found in environment variables.", file=sys.stderr)
-        return
-
-    headers = {'Authorization': f'token {access_token}'}
+    # Replace 'your_github_token' with your actual GitHub token
+    github_token = "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"
+    headers = {'Authorization': f'token {github_token}'}
 
     source_file_response = requests.get(source_api_url, headers=headers)
     print(f"Source API URL: {source_api_url}")
