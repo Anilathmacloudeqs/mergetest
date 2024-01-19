@@ -1,3 +1,6 @@
+import requests
+github_token = sys.argv[1]
+
 username = "Anilathmacloudeqs"
 repository = "mergetest"
 source_branch = "main"
@@ -7,7 +10,9 @@ commit_message = "Commit message"
 print("entered input")
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
+print(f"Source API URL: {source_api_url}")
 destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
+print(f"Destination API URL: {destination_api_url}")
 github_headers = {"Authorization": f"token {github_token}"}
 print("url set")
 source_file_response = requests.get(source_api_url, headers=github_headers)
