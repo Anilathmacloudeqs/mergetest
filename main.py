@@ -4,13 +4,13 @@ source_branch = "main"
 destination_branch = "release"
 file_path = "main.py"
 commit_message = "Commit message"
+print("entered input")
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
 destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
-
-headers = {'Authorization': f'token {github_token}'}
-
-source_file_response = requests.get(source_api_url, headers=headers)
+github_headers = {"Authorization": f"token {github_token}"}
+print("url set")
+source_file_response = requests.get(source_api_url, headers=github_headers)
 
 if source_file_response.status_code == 200:
     source_file_content = source_file_response.json()
@@ -25,7 +25,7 @@ if source_file_response.status_code == 200:
         'sha': source_commit_sha
     }
 
-    response = requests.put(destination_api_url, headers=headers, json=payload)
+    response = requests.put(destination_api_url, headers=github_headers, json=payload)
 
     if response.status_code == 201 or response.status_code == 200:
         print(f"File '{file_path}' successfully pushed to the '{destination_branch}' branch.")
