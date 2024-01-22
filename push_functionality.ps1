@@ -19,6 +19,7 @@ $destinationShaUrl = "https://api.github.com/repos/$username/$repository/git/ref
 $headers = @{
     'Authorization' = "token $githubToken"
 }
+Write-Host "starting AWS_GIT_PUSH."
 
 # Fetch source file content
 $sourceFileResponse = Invoke-RestMethod -Uri $sourceApiUrl -Headers $headers -Method Get
