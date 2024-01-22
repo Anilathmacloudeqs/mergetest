@@ -1,0 +1,101 @@
+---
+# Name of build run.
+name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+# Disable CI triggers.
+trigger: none 
+
+# Configuration of pool can be set-up on pipeline scope or Job scope.
+# Agent on which build runs.
+pool:
+    name: "Azure Pipelines"
+
+parameters:
+  - name: Tag
+    type: string    
+
+
+
+stages:
+  - stage: sync_rls_test
+    displayName: RLS-TO-TEST-STG
+    variables: 
+    - group: vg_edw_matillion
+    - group: vg_edw_matillion_credentials
+    # dependsOn: User1_To_Dev
+    jobs:
+    - deployment: dply_rls_test
+      environment: edp-matillion-test
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+              clean: true
+              persistCredentials: true
+              
+            - task: PowerShell@2                         
+              inputs:
+                filePath: '$(System.DefaultWorkingDirectory)/workflow/getcommitid.ps1'
+                arguments: '-SourceTag ${{parameters.Tag}} '
+                pwsh: true
+              displayName: GetCommitId
+                    
+            - task: UsePythonVersion@0
+              inputs:
+                versionSpec: '3.x'
+                addToPath: true
+                architecture: 'x64'
+              displayName: Select-PythonVersion
+            - task: CmdLine@2
+              inputs:
+                script: |
+                  echo "installing required packages"
+                  python3 -m pip install requests==2.28.1                  
+              displayName: Install-Python-Packages
+            - task: PythonScript@0
+              inputs:
+                scriptSource: 'filePath'
+                scriptPath: '$(System.DefaultWorkingDirectory)/workflow/matillion_api_call.py'
+                arguments: $(svc_matillion_username_test) $(svc_matillion_password_test) $(Matillion_Project_TEST) $(Matillion_Group) $(Matillion_Version) $(Matillion_Instance_TEST) $(svc_repos_email) $(svc_repos_password) $(commitid)
+              displayName: Matillion-APICall-SwitchVersions
+  - stage: sync_rls_prod
+    displayName: RLS-TO-PROD-STG
+    variables: 
+    - group: vg_edw_matillion
+    - group: vg_edw_matillion_credentials    
+    jobs:
+    - deployment: dply_rls_prod
+      environment: edp-matillion-prod
+      strategy:
+        runOnce:
+          deploy:
+            steps:              
+            - checkout: self
+              clean: true
+              persistCredentials: true
+            - task: PowerShell@2                         
+              inputs:
+                filePath: '$(System.DefaultWorkingDirectory)/workflow/mergerepo.ps1'
+                arguments: '-SourceTag ${{parameters.Tag}} -TargetBranch $(TargetBranch_PROD) -svc_repos_email $(svc_repos_email) -svc_repos_username $(svc_repos_username)'
+                pwsh: true                
+              displayName: merge_branch
+                    
+            - task: UsePythonVersion@0
+              inputs:
+                versionSpec: '3.x'
+                addToPath: true
+                architecture: 'x64'
+              displayName: Select-PythonVersion
+            - task: CmdLine@2
+              inputs:
+                script: |
+                  echo "installing required packages"
+                  python3 -m pip install requests==2.28.1                  
+              displayName: Install-Python-Packages
+            - task: PythonScript@0
+              inputs:
+                scriptSource: 'filePath'
+                scriptPath: '$(System.DefaultWorkingDirectory)/workflow/matillion_api_call.py'
+                arguments: $(svc_matillion_username_prod) $(svc_matillion_password_prod) $(Matillion_Project_PROD) $(Matillion_Group) $(Matillion_Version) $(Matillion_Instance_PROD) $(svc_repos_email) $(svc_repos_password) $(commitid)
+              displayName: Matillion-APICall-SwitchVersions
