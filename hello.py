@@ -1,3 +1,8 @@
 print("hello 2401-evening test")
-from __main__ import username, repository, source_branch, destination_branch, file_path, github_token
+username = 'Anilathmacloudeqs'
+repository = 'mergetest'
+source_branch = 'main'
+destination_branch = 'release'
+file_path = 'hello.py'
+github_token = "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"
 print("username",username)
