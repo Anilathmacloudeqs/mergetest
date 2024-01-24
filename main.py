@@ -1,4 +1,12 @@
 print("started")
+import sys
+
+# Read values from command-line arguments
+if len(sys.argv) != 8:
+    print("Usage: main.py <github_token> <username> <repository> <source_branch> <destination_branch> <file_path> <commit_message>")
+    sys.exit(1)
+
+github_token, username, repository, source_branch, destination_branch, file_path_main, commit_message = sys.argv[1:]
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
 print(f"Source API URL: {source_api_url}")
