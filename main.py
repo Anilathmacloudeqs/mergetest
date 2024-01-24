@@ -1,12 +1,16 @@
 print("starting main.py")
-from __main__ import username, repository, source_branch, destination_branch, file_path, github_token
+username = 'Anilathmacloudeqs'
+repository = 'mergetest'
+source_branch = 'main'
+destination_branch = 'release'
+file_path = 'hello.py'
+github_token = "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"
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
     destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
     destination_sha_url = f'https://api.github.com/repos/{username}/{repository}/git/refs/heads/{destination_branch}'
 
     source_file_response = requests.get(source_api_url, headers=headers)
-    codepipeline = boto3.client('codepipeline')
 
     if source_file_response.status_code == 200:
         source_file_content = source_file_response.json()
@@ -27,12 +31,10 @@ source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents
 
         destination_commit_sha = destination_sha_response.json()['object']['sha']
 
-        # Check if the content needs to be updated
         if source_commit_sha == destination_commit_sha:
             print(f"File '{file_path}' is already up to date in the '{destination_branch}' branch.")
             codepipeline.put_job_success_result(jobId=event['CodePipeline.job']['id'])
         else:
-            # Check if the file exists in the destination branch
             destination_file_response = requests.get(destination_api_url, headers=headers)
 
             if destination_file_response.status_code == 200:
@@ -58,13 +60,7 @@ source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents
                 else:
                     print(f"Error: Unable to update file. Status code: {update_response.status_code}", file=sys.stderr)
                     print(update_response.json(), file=sys.stderr)
-                    codepipeline.put_job_failure_result(
-                        jobId=event['CodePipeline.job']['id'],
-                        failureDetails={
-                            'type': 'JobFailed',
-                            'message': f'Unable to update file. Status code: {update_response.status_code}'
-                        }
-                    )
+                    
             else:
                 new_decoded_content = base64.b64decode(source_file_content['content']).decode()
                 encoded_content = base64.b64encode(new_decoded_content.encode()).decode()
@@ -84,19 +80,6 @@ source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents
                 else:
                     print(f"Error: Unable to push file. Status code: {create_response.status_code}", file=sys.stderr)
                     print(create_response.json(), file=sys.stderr)
-                    codepipeline.put_job_failure_result(
-                        jobId=event['CodePipeline.job']['id'],
-                        failureDetails={
-                            'type': 'JobFailed',
-                            'message': f'Unable to push file. Status code: {create_response.status_code}'
-                        }
-                    )
+                    
     else:
         print(f"Error: Unable to fetch source file. Status code: {source_file_response.status_code}", file=sys.stderr)
-        codepipeline.put_job_failure_result(
-            jobId=event['CodePipeline.job']['id'],
-            failureDetails={
-                'type': 'JobFailed',
-                'message': f'Unable to fetch source file. Status code: {source_file_response.status_code}'
-            }
-        )
