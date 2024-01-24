@@ -5,6 +5,7 @@ source_branch = 'main'
 destination_branch = 'release'
 file_path = 'hello.py'
 github_token = "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"
+headers = {'Authorization': f'token {github_token}'}
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
     destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
