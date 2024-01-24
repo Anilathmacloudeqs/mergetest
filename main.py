@@ -1,4 +1,5 @@
 print("starting main.py")
+from __main__ import username, repository, source_branch, destination_branch, file_path, github_token
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
     destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
