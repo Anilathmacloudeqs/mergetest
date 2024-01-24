@@ -1,8 +1,4 @@
 print("started")
-import sys
-import requests
-import json
-import base64
 
 # Read values from command-line arguments
 if len(sys.argv) != 8:
