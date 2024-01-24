@@ -1,5 +1,8 @@
 print("started")
 import sys
+import requests
+import json
+import base64
 
 # Read values from command-line arguments
 if len(sys.argv) != 8:
@@ -8,10 +11,10 @@ if len(sys.argv) != 8:
 
 github_token, username, repository, source_branch, destination_branch, file_path_main, commit_message = sys.argv[1:]
 
-source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
+source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path_main}?ref={source_branch}'
 print(f"Source API URL: {source_api_url}")
 
-destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={destination_branch}'
+destination_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path_main}?ref={destination_branch}'
 print(f"Destination API URL: {destination_api_url}")
 
 github_headers = {"Authorization": f"token {github_token}"}
@@ -35,7 +38,7 @@ if source_file_response.status_code == 200:
     response = requests.put(destination_api_url, headers=github_headers, json=payload)
 
     if response.status_code == 201 or response.status_code == 200:
-        print(f"File '{file_path}' successfully pushed to the '{destination_branch}' branch.")
+        print(f"File '{file_path_main}' successfully pushed to the '{destination_branch}' branch.")
     else:
         print(f"Error: Unable to push file. Status code: {response.status_code}", file=sys.stderr)
         print(response.json(), file=sys.stderr)
