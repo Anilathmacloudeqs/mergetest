@@ -4,7 +4,7 @@ repository = 'mergetest'
 source_branch = 'main'
 destination_branch = 'release'
 file_path = 'hello.py'
-github_token = "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"
+github_token = "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"
 headers = {'Authorization': f'token {github_token}'}
 
 source_api_url = f'https://api.github.com/repos/{username}/{repository}/contents/{file_path}?ref={source_branch}'
